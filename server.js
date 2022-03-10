@@ -6,13 +6,20 @@ import { createServer } from "http";
 import { Server } from 'socket.io';
 
 const PORT_NUMBER = process.env.PORT || 5001;
+
+//connecting mongodb
 connect_to_mongodb().then((value) => console.log('connected to mongodb'), (err) => console.log(err));
 
 const app = express();
+
+//we are using this function for getting violation documents.
 async function get_all_violations(ViolationModel) {
     return await ViolationModel.find();
 }
+
 app.use(cors());
+
+//for development needs we are not using this request in production.
 app.get('/add-violation', (req, res) => {
     const violation_entry = new Violation1Model(
         {
@@ -24,6 +31,7 @@ app.get('/add-violation', (req, res) => {
     })
 });
 
+//requests for getting all violations
 app.get('/all-violations1', (req, res) => {
     get_all_violations(Violation1Model).then((violations) => res.json(violations), (err) => console.log(err));
 });
@@ -44,11 +52,13 @@ const io = new Server(httpServer, {
     }
 });
 
+//we are watching our violation collections for changes.
 const Violation1ChangeStream = Violation1Model.watch();
 const Violation2ChangeStream = Violation2Model.watch();
 const Violation3ChangeStream = Violation3Model.watch();
 
-
+//If anything changes at out violation1 collection this callback fires
+//This callback sends events to our ui for updates if anything changes.
 Violation1ChangeStream.on('change', (data) => {
     //console.log(data);
     //console.log(data.documentKey._id.toString())
@@ -67,6 +77,8 @@ Violation1ChangeStream.on('change', (data) => {
     }
 })
 
+//If anything changes at out violation2 collection this callback fires
+//This callback sends events to our ui for updates if anything changes.
 Violation2ChangeStream.on('change', (data) => {
     console.log(data);
     if (data.operationType === 'delete') {
@@ -84,6 +96,8 @@ Violation2ChangeStream.on('change', (data) => {
     }
 })
 
+//If anything changes at out violation3 collection this callback fires
+//This callback sends events to our ui for updates if anything changes.
 Violation3ChangeStream.on('change', (data) => {
     console.log(data);
     if (data.operationType === 'delete') {
@@ -101,7 +115,7 @@ Violation3ChangeStream.on('change', (data) => {
     }
 })
 
-
+//If user connects log socker.id
 io.on('connection', function (socket) {
     console.log('A user connected');
     console.log(socket.id);
@@ -112,6 +126,7 @@ io.on('connection', function (socket) {
     });
 });
 
+//Starting server at PORT_NUMBER
 httpServer.listen(PORT_NUMBER, () => {
     console.log(`Server started running at port ${PORT_NUMBER}`);
 });
