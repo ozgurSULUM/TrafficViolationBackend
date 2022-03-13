@@ -1,5 +1,5 @@
 import connect_to_mongodb from './connect_to_mongodb.js';
-import { Violation1Model, Violation2Model, Violation3Model } from './violation-model.js';
+import { Violation1Model, Violation2Model, Violation3Model } from './violation_model.js';
 import express from 'express';
 import cors from 'cors';
 import { createServer } from "http";
