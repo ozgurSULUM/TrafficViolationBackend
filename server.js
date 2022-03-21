@@ -1,5 +1,5 @@
 import connect_to_mongodb from './connect_to_mongodb.js';
-import { Violation1Model, Violation2Model, Violation3Model } from './violation-model.js';
+import { Violation1Model, Violation2Model, Violation3Model } from './violation_model.js';
 import express from 'express';
 import cors from 'cors';
 import { createServer } from "http";
@@ -33,7 +33,7 @@ app.get('/add-violation', (req, res) => {
 
 //requests for getting all violations
 app.get('/all-violations1', (req, res) => {
-    get_all_violations(Violation1Model).then((violations) => res.json(violations), (err) => console.log(err));
+    get_all_violations(Violation1Model).then((violations) => {console.log(violations);return res.json(violations);}, (err) => console.log(err));
 });
 
 app.get('/all-violations2', (req, res) => {
